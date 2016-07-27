@@ -1,6 +1,6 @@
 # The GoCD bot that posts to an RocketChat webhook
 # To build: sudo docker build [--no-cache=true] [--pull=true] --rm=true -t gobot .
-# To run e.g: sudo docker run --name=gobot -d gobot -e "WEBHOOK=pahtorocketchatwebhook.com/tokenz" -e "GODOMAIN=domain" -e "GOSTAGES=stage,names"
+# To run e.g: sudo docker run --name=gobot -e "WEBHOOK=pahtorocketchatwebhook.com/tokenz" -e "GODOMAIN=domain" -e "GOSTAGES=stage,names" --restart=unless-stopped -d gobot
 
 
 FROM ubuntu:16.04
