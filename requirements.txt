@@ -1,0 +1,2 @@
+dnspython
+websocket-client
