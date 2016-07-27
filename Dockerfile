@@ -24,4 +24,4 @@ USER root
 RUN pip install -r rocketgobot/requirements.txt
 
 USER iamgobot
-ENTRYPOINT ["/bin/bash", "/home/iamgobot/rocketgobot/start_gobot.sh"]
+ENTRYPOINT ["/bin/bash", "/home/iamgobot/rocketgobot/start_rocketgobot.sh"]
