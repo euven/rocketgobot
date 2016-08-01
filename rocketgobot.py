@@ -2,7 +2,7 @@ import sys
 import json
 import time
 import logging
-from optparse import OptionParser
+import argparse
 import websocket
 import requests
 
@@ -75,29 +75,26 @@ class GoBotRocket(object):
 
 if __name__ == '__main__':
     # Setup the command line arguments.
-    optp = OptionParser()
+    argp = argparse.ArgumentParser(description="GoCD bot for RocketChat")
 
-    optp.add_option('-q', '--quiet', help='set logging to ERROR',
-                    action='store_const', dest='loglevel',
-                    const=logging.ERROR, default=logging.INFO)
-    optp.add_option("-w", "--webook", dest="webhookurl",
-                    help="The rocketchat web hook url, incl token")
-    optp.add_option("-g", "--godomain", dest="godomain",
-                    help="GoCD domain to connect to")
-    optp.add_option("-s", "--stages", dest="stages",
-                    help="comma-seperated list of stage names to report on")
+    argp.add_argument('-q', '--quiet', help='set logging to ERROR',
+                      action='store_const', dest='loglevel',
+                      const=logging.ERROR, default=logging.INFO)
+    argp.add_argument("-w", "--webhook", dest="webhookurl",
+                      help="The RocketChat webhook URL, including token")
+    argp.add_argument("-g", "--godomain", dest="godomain",
+                      help="GoCD domain to connect to")
+    argp.add_argument("-s", "--stages", dest="stages",
+                      help="Comma-separated list of stage names to report on")
 
-    opts, args = optp.parse_args()
+    args = argp.parse_args()
 
     # Setup logging.
-    logging.basicConfig(level=opts.loglevel,
-                        format='%(levelname)-8s %(message)s')
-
+    logging.basicConfig(level=args.loglevel, format='%(levelname)-8s %(message)s')
 
     rocketbot = GoBotRocket(
-        opts.webhookurl,
-        opts.godomain,
-        opts.stages.split(',')
+        args.webhookurl,
+        args.godomain,
+        args.stages.split(',')
     )
     rocketbot.run()
-
