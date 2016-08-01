@@ -6,7 +6,9 @@ import argparse
 import websocket
 import requests
 
+
 class GoBotRocket(object):
+
     def __init__(self, webhookurl, godomain, stages):
         self.failedpipes = []
         self.webhookurl = webhookurl
@@ -15,15 +17,15 @@ class GoBotRocket(object):
 
         websocket.enableTrace(True)
         self.ws = websocket.WebSocketApp("ws://%s:8887/" % self.godomain,
-                                            on_message=self.gocd_message,
-                                            on_error=self.gocd_error,
-                                            on_close=self.gocd_close)
+                                         on_message=self.gocd_message,
+                                         on_error=self.gocd_error,
+                                         on_close=self.gocd_close)
 
         # if we later wanna do more stuff, start a thread in somefunc?
         # self.ws.on_open = somefunc
+
     def __del__(self):
         self.ws.close()
-
 
     def run(self):
         sleepsecs = 60
@@ -32,14 +34,13 @@ class GoBotRocket(object):
                 logging.info('start websocket listener')
                 self.ws.run_forever()
                 logging.error("Trying websocket reconnect in %s secs",
-                        sleepsecs)
+                              sleepsecs)
                 time.sleep(sleepsecs)
             except:
                 logging.error("Unexpected error: %s", sys.exc_info()[0])
                 logging.error("Trying websocket reconnect in %s seconds",
-                        sleepsecs)
+                              sleepsecs)
                 time.sleep(sleepsecs)
-
 
     def gocd_message(self, ws, message):
         msg = json.loads(message)
@@ -50,17 +51,15 @@ class GoBotRocket(object):
             if stage['state'] == 'Passed' and pipename in self.failedpipes:
                 self.failedpipes.remove(pipename)
                 self.rocket_message("[%s](%s) (%s) fixed :grinning:" %
-                        (pipename, golink, stage['name']))
+                                    (pipename, golink, stage['name']))
             elif stage['state'] == 'Failed' and pipename not in self.failedpipes:
                 self.failedpipes.append(pipename)
                 self.rocket_message("[%s](%s) (%s) broken :scream:" %
-                        (pipename, golink, stage['name']))
-
+                                    (pipename, golink, stage['name']))
 
     def gocd_error(self, ws, error):
         logging.error("GOCD ERROR!!!")
         logging.error(error)
-
 
     def gocd_close(self, ws):
         logging.info("### gocd ws closed ###")
@@ -72,6 +71,7 @@ class GoBotRocket(object):
         }
 
         requests.post(self.webhookurl, data=json.dumps(msgdata))
+
 
 if __name__ == '__main__':
     # Setup the command line arguments.
