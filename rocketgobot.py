@@ -5,6 +5,7 @@ import logging
 import argparse
 import websocket
 import requests
+import signal
 
 
 class GoBotRocket(object):
@@ -14,6 +15,10 @@ class GoBotRocket(object):
         self.webhookurl = webhookurl
         self.godomain = godomain
         self.stages = stages
+        self.stop = False
+
+        signal.signal(signal.SIGINT, self.terminate)
+        signal.signal(signal.SIGTERM, self.terminate)
 
         websocket.enableTrace(True)
         self.ws = websocket.WebSocketApp("ws://{domain}:8887/".format(domain=self.godomain),
@@ -27,14 +32,20 @@ class GoBotRocket(object):
     def __del__(self):
         self.ws.close()
 
+    def terminate(self, signum, frame):
+        self.stop = True
+        if self.ws:
+            try:
+                self.ws.close()
+            except:
+                pass
+
     def run(self):
         sleepsecs = 60
-        while 1:
+        while not self.stop:
             try:
-                logging.info('start websocket listener')
+                logging.info('Start websocket listener')
                 self.ws.run_forever()
-                logging.error("Trying websocket reconnect in {} secs".format(sleepsecs))
-                time.sleep(sleepsecs)
             except:
                 logging.error("Unexpected error: {}".format(sys.exc_info()[0]))
                 logging.error("Trying websocket reconnect in {} seconds".format(sleepsecs))
