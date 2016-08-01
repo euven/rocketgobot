@@ -16,7 +16,7 @@ class GoBotRocket(object):
         self.stages = stages
 
         websocket.enableTrace(True)
-        self.ws = websocket.WebSocketApp("ws://%s:8887/" % self.godomain,
+        self.ws = websocket.WebSocketApp("ws://{domain}:8887/".format(domain=self.godomain),
                                          on_message=self.gocd_message,
                                          on_error=self.gocd_error,
                                          on_close=self.gocd_close)
@@ -33,13 +33,11 @@ class GoBotRocket(object):
             try:
                 logging.info('start websocket listener')
                 self.ws.run_forever()
-                logging.error("Trying websocket reconnect in %s secs",
-                              sleepsecs)
+                logging.error("Trying websocket reconnect in {} secs".format(sleepsecs))
                 time.sleep(sleepsecs)
             except:
-                logging.error("Unexpected error: %s", sys.exc_info()[0])
-                logging.error("Trying websocket reconnect in %s seconds",
-                              sleepsecs)
+                logging.error("Unexpected error: {}".format(sys.exc_info()[0]))
+                logging.error("Trying websocket reconnect in {} seconds".format(sleepsecs))
                 time.sleep(sleepsecs)
 
     def gocd_message(self, ws, message):
@@ -47,7 +45,7 @@ class GoBotRocket(object):
         pipename = msg['pipeline']['name']
         stage = msg['pipeline']['stage']
         if stage['name'] in self.stages:
-            golink = 'https://%s/go/tab/pipeline/history/%s' % (self.godomain, pipename)
+            golink = 'https://{domain}/go/tab/pipeline/history/{pipe}'.format(domain=self.godomain, pipe=pipename)
             if stage['state'] == 'Passed' and pipename in self.failedpipes:
                 self.failedpipes.remove(pipename)
                 self.rocket_message("[%s](%s) (%s) fixed :grinning:" %
