@@ -50,12 +50,10 @@ class GoBotRocket(object):
             golink = 'https://%s/go/tab/pipeline/history/%s' % (self.godomain, pipename)
             if stage['state'] == 'Passed' and pipename in self.failedpipes:
                 self.failedpipes.remove(pipename)
-                self.rocket_message("[%s](%s) (%s) fixed :grinning:" %
-                                    (pipename, golink, stage['name']))
+                self.send_message_fixed(pipename, golink, stage['name'])
             elif stage['state'] == 'Failed' and pipename not in self.failedpipes:
                 self.failedpipes.append(pipename)
-                self.rocket_message("[%s](%s) (%s) broken :scream:" %
-                                    (pipename, golink, stage['name']))
+                self.send_message_failed(pipename, golink, stage['name'])
 
     def gocd_error(self, ws, error):
         logging.error("GOCD ERROR!!!")
@@ -64,12 +62,19 @@ class GoBotRocket(object):
     def gocd_close(self, ws):
         logging.info("### gocd ws closed ###")
 
+    def send_message_fixed(self, pipe, link, stage):
+        self.rocket_message("[{pipe}]({link}) ({stage}) *fixed* :grinning:"
+                            .format(pipe=pipe, link=link, stage=stage))
+
+    def send_message_failed(self, pipe, link, stage):
+        self.rocket_message("[{pipe}]({link}) ({stage}) *broken* :scream:"
+                            .format(pipe=pipe, link=link, stage=stage))
+
     def rocket_message(self, message):
         msgdata = {
             "username": "gobot",
             "text": message
         }
-
         requests.post(self.webhookurl, data=json.dumps(msgdata))
 
 
