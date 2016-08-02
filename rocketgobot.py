@@ -56,15 +56,16 @@ class GoBotRocket(object):
         pipename = msg['pipeline']['name']
         stage = msg['pipeline']['stage']
         if stage['name'] in self.stages:
-            golink = 'https://{domain}/go/tab/pipeline/history/{pipe}'.format(domain=self.godomain, pipe=pipename)
+            golink = 'https://{domain}/go/tab/pipeline/history/{pipe}'.format(
+                    domain=self.godomain, pipe=pipename)
+            baserocketmsg = "[{pipe}]({link}) ({stage})".format(
+                    pipe=pipename, link=golink, stage=stage['name'])
             if stage['state'] == 'Passed' and pipename in self.failedpipes:
                 self.failedpipes.remove(pipename)
-                self.rocket_message("[%s](%s) (%s) fixed :grinning:" %
-                                    (pipename, golink, stage['name']))
+                self.rocket_message("{} *fixed* :grinning:".format(baserocketmsg))
             elif stage['state'] == 'Failed' and pipename not in self.failedpipes:
                 self.failedpipes.append(pipename)
-                self.rocket_message("[%s](%s) (%s) broken :scream:" %
-                                    (pipename, golink, stage['name']))
+                self.rocket_message("{} *broken* :scream:".format(baserocketmsg))
 
     def gocd_error(self, ws, error):
         logging.error("GOCD ERROR!!!")
