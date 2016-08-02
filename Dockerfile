@@ -18,9 +18,9 @@ RUN useradd -ms /bin/bash iamgobot
 USER iamgobot
 WORKDIR /home/iamgobot
 
-RUN git clone http://github.com/eugeneventer/rocketgobot.git
-RUN git config --global user.name gobot
-RUN git config --global user.email gobothasnoemail
+RUN git clone http://github.com/eugeneventer/rocketgobot.git && \
+    git config --global user.name gobot && \
+    git config --global user.email gobothasnoemail
 
 USER root
 RUN pip install -r rocketgobot/requirements.txt
