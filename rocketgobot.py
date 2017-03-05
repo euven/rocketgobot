@@ -21,10 +21,10 @@ class GoBotRocket(object):
         signal.signal(signal.SIGTERM, self.terminate)
 
         websocket.enableTrace(True)
-        self.ws = websocket.WebSocketApp("ws://{domain}:8887/".format(domain=self.godomain),
-                                         on_message=self.gocd_message,
-                                         on_error=self.gocd_error,
-                                         on_close=self.gocd_close)
+        self.ws = websocket.WebSocketApp(
+            "ws://{domain}:8887/".format(domain=self.godomain),
+            on_message=self.gocd_message, on_error=self.gocd_error,
+            on_close=self.gocd_close)
 
         # if we later wanna do more stuff, start a thread in somefunc?
         # self.ws.on_open = somefunc
@@ -48,7 +48,8 @@ class GoBotRocket(object):
                 self.ws.run_forever()
             except:
                 logging.error("Unexpected error: {}".format(sys.exc_info()[0]))
-                logging.error("Trying websocket reconnect in {} seconds".format(sleepsecs))
+                logging.error(
+                    "Trying websocket reconnect in {} seconds".format(sleepsecs))
                 time.sleep(sleepsecs)
 
     def gocd_message(self, ws, message):
@@ -62,14 +63,19 @@ class GoBotRocket(object):
                     pipe=pipename, link=golink, stage=stage['name'])
             if stage['state'] == 'Passed' and pipename in self.failedpipes:
                 self.failedpipes.remove(pipename)
-                self.rocket_message("{} *fixed* :grinning:".format(baserocketmsg))
+                self.rocket_message(
+                    "{} *fixed* :grinning:".format(baserocketmsg))
             elif stage['state'] == 'Failed' and pipename not in self.failedpipes:
                 self.failedpipes.append(pipename)
-                self.rocket_message("{} *broken* :scream:".format(baserocketmsg))
+                self.rocket_message(
+                    "{} *broken* :scream:".format(baserocketmsg))
 
     def gocd_error(self, ws, error):
         logging.error("GOCD ERROR!!!")
         logging.error(error)
+
+        # we want to rest a little on errors
+        time.sleep(60)
 
     def gocd_close(self, ws):
         logging.info("### gocd ws closed ###")
@@ -100,7 +106,9 @@ if __name__ == '__main__':
     args = argp.parse_args()
 
     # Setup logging.
-    logging.basicConfig(level=args.loglevel, format='%(levelname)-8s %(message)s')
+    logging.basicConfig(
+        level=args.loglevel,
+     format='%(levelname)-8s %(message)s')
 
     rocketbot = GoBotRocket(
         args.webhookurl,
